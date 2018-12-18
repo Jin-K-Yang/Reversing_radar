@@ -59,29 +59,8 @@ void setup() {
   pinMode(buzzerpin, OUTPUT);
 }
 
-void loop() {
+int measure_distance(){
   digitalWrite(trigpin, LOW);
-  delayMicroseconds(10);
-  digitalWrite(trigpin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigpin, LOW);
-  pinMode(echopin, INPUT);
-  
-  duration = pulseIn(echopin, HIGH);
-  cm = duration / 2 * 0.034;
-  
-  Serial.print("Distance : ");
-  Serial.print(cm);
-  Serial.println("cm");
-
-  cm = (int)(cm + 0.5);
-
-  disp(cm);
-
-  if(cm > 0 && cm < 10){
-  length = sizeof(starTone)-1;
-  for(int i = 0; i < length; i++){
-    digitalWrite(trigpin, LOW);
     delayMicroseconds(10);
     digitalWrite(trigpin, HIGH);
     delayMicroseconds(10);
@@ -96,7 +75,13 @@ void loop() {
     Serial.println("cm");
 
     cm = (int)(cm + 0.5);
+    return(cm);
+}
 
+void loop() {
+  length = sizeof(starTone)-1;
+  for(int i = 0; i < length; i++){
+    cm = measure_distance();
     disp(cm);
     if(cm > 0 && cm < 10){
       toneNo = getTone(starTone[i]);
@@ -104,7 +89,10 @@ void loop() {
       tone(buzzerpin, toneTable[toneNo][3]);
       delay(tone_duration);
       noTone(buzzerpin);
-      }
+    }
+    else{
+      analogWrite(buzzerpin, 255);
+      delay(1000);
     }
   }
 }
